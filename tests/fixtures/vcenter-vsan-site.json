@@ -1,0 +1,1219 @@
+{
+ "schema_version": 1,
+ "collection": {
+  "tool": "lts-discover",
+  "tool_version": "0.1.0",
+  "source": "vcenter",
+  "source_detail": "vcsa.example.test",
+  "collected_at": "2026-10-24T14:05:00Z",
+  "product": {
+   "name": "VMware vCenter Server",
+   "version": "8.0.2",
+   "build": "22617221",
+   "api_version": "8.0.2.0",
+   "licence_expires": "2027-03-31"
+  },
+  "privileges_used": [
+   "System.Anonymous",
+   "System.Read",
+   "System.View"
+  ],
+  "perf_window_days": 30,
+  "redacted": false,
+  "redaction_salt": "00112233445566778899aabbccddeeff",
+  "missing": [],
+  "warnings": [
+   "SQL01_replica on esx03.example.test has no IP address"
+  ]
+ },
+ "clusters": [
+  {
+   "id": "domain-c8",
+   "name": "Cluster-A",
+   "ha_enabled": true,
+   "drs_enabled": true,
+   "evc_mode": "intel-icelake",
+   "vsan_enabled": true,
+   "host_ids": [
+    "host-1",
+    "host-2",
+    "host-3"
+   ]
+  }
+ ],
+ "hosts": [
+  {
+   "id": "host-1",
+   "name": "esx01.example.test",
+   "cluster_id": "domain-c8",
+   "connection_state": "connected",
+   "maintenance_mode": false,
+   "hardware": {
+    "vendor": "Example Systems",
+    "model": "Rack Server 2U",
+    "serial": "EX000001",
+    "uuid": "00000000-0000-0000-0000-000000000001",
+    "bios_version": "1.0.0"
+   },
+   "cpu": {
+    "model": "Intel(R) Xeon(R) Gold 5318Y CPU @ 2.10GHz",
+    "sockets": 2,
+    "cores": 48,
+    "threads": 96,
+    "mhz": 2100
+   },
+   "memory_mb": 524288,
+   "esxi": {
+    "version": "8.0.2",
+    "build": "22380479"
+   },
+   "nics": [
+    {
+     "device": "vmnic0",
+     "mac": "02:00:00:00:00:10",
+     "speed_mbps": 1000,
+     "driver": "ntg3",
+     "pci_id": "14e4:165f"
+    },
+    {
+     "device": "vmnic2",
+     "mac": "02:00:00:00:00:12",
+     "speed_mbps": 25000,
+     "driver": "nmlx5_core",
+     "pci_id": "15b3:1015"
+    },
+    {
+     "device": "vmnic3",
+     "mac": "02:00:00:00:00:13",
+     "speed_mbps": 25000,
+     "driver": "nmlx5_core",
+     "pci_id": "15b3:1015"
+    }
+   ],
+   "storage_adapters": [
+    {
+     "device": "vmhba0",
+     "type": "raid",
+     "model": "Example RAID 8i",
+     "driver": "lsi_mr3"
+    },
+    {
+     "device": "vmhba2",
+     "type": "fc",
+     "model": "Example 32Gb FC HBA",
+     "driver": "qlnativefc",
+     "identifier": "20:00:00:00:00:00:00:01"
+    }
+   ],
+   "vswitches": [
+    {
+     "name": "vSwitch0",
+     "kind": "standard",
+     "mtu": 1500,
+     "uplinks": [
+      "vmnic0"
+     ],
+     "lacp": false,
+     "portgroups": [
+      {
+       "name": "Management Network",
+       "vlan": 0
+      }
+     ]
+    },
+    {
+     "name": "DSwitch-A",
+     "kind": "distributed",
+     "mtu": 9000,
+     "uplinks": [
+      "vmnic2",
+      "vmnic3"
+     ],
+     "lacp": true,
+     "portgroups": [
+      {
+       "name": "PG-Servers",
+       "vlan": 20
+      },
+      {
+       "name": "PG-vSAN",
+       "vlan": 30
+      },
+      {
+       "name": "PG-vMotion",
+       "vlan": 31
+      },
+      {
+       "name": "PG-Trunk",
+       "vlan": "trunk:100-199"
+      }
+     ]
+    }
+   ],
+   "vmkernels": [
+    {
+     "device": "vmk0",
+     "portgroup": "Management Network",
+     "ip": "192.0.2.11",
+     "netmask": "255.255.255.0",
+     "mtu": 1500,
+     "services": [
+      "management"
+     ]
+    },
+    {
+     "device": "vmk1",
+     "portgroup": "PG-vMotion",
+     "ip": "198.51.100.11",
+     "netmask": "255.255.255.0",
+     "mtu": 9000,
+     "services": [
+      "vmotion"
+     ]
+    },
+    {
+     "device": "vmk2",
+     "portgroup": "PG-vSAN",
+     "ip": "198.51.100.31",
+     "netmask": "255.255.255.0",
+     "mtu": 9000,
+     "services": [
+      "vsan"
+     ]
+    }
+   ],
+   "local_disks": [
+    {
+     "device": "naa.6000000000000000000000000000b010",
+     "vendor": "EXAMPLE",
+     "model": "M.2 BOOT",
+     "size_gb": 480,
+     "kind": "ssd"
+    }
+   ],
+   "vsan": {
+    "disk_groups": [
+     {
+      "cache": [
+       {
+        "device": "naa.5000000000000000000000000000c100",
+        "vendor": "EXAMPLE",
+        "model": "NVME 1.6TB",
+        "size_gb": 1600,
+        "kind": "nvme"
+       }
+      ],
+      "capacity": [
+       {
+        "device": "naa.5000000000000000000000000000d100",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d101",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d102",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d103",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       }
+      ]
+     },
+     {
+      "cache": [
+       {
+        "device": "naa.5000000000000000000000000000c110",
+        "vendor": "EXAMPLE",
+        "model": "NVME 1.6TB",
+        "size_gb": 1600,
+        "kind": "nvme"
+       }
+      ],
+      "capacity": [
+       {
+        "device": "naa.5000000000000000000000000000d110",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d111",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d112",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d113",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "host-2",
+   "name": "esx02.example.test",
+   "cluster_id": "domain-c8",
+   "connection_state": "connected",
+   "maintenance_mode": false,
+   "hardware": {
+    "vendor": "Example Systems",
+    "model": "Rack Server 2U",
+    "serial": "EX000002",
+    "uuid": "00000000-0000-0000-0000-000000000002",
+    "bios_version": "1.0.0"
+   },
+   "cpu": {
+    "model": "Intel(R) Xeon(R) Gold 5318Y CPU @ 2.10GHz",
+    "sockets": 2,
+    "cores": 48,
+    "threads": 96,
+    "mhz": 2100
+   },
+   "memory_mb": 524288,
+   "esxi": {
+    "version": "8.0.2",
+    "build": "22380479"
+   },
+   "nics": [
+    {
+     "device": "vmnic0",
+     "mac": "02:00:00:00:00:20",
+     "speed_mbps": 1000,
+     "driver": "ntg3",
+     "pci_id": "14e4:165f"
+    },
+    {
+     "device": "vmnic2",
+     "mac": "02:00:00:00:00:22",
+     "speed_mbps": 25000,
+     "driver": "nmlx5_core",
+     "pci_id": "15b3:1015"
+    },
+    {
+     "device": "vmnic3",
+     "mac": "02:00:00:00:00:23",
+     "speed_mbps": 25000,
+     "driver": "nmlx5_core",
+     "pci_id": "15b3:1015"
+    }
+   ],
+   "storage_adapters": [
+    {
+     "device": "vmhba0",
+     "type": "raid",
+     "model": "Example RAID 8i",
+     "driver": "lsi_mr3"
+    },
+    {
+     "device": "vmhba2",
+     "type": "fc",
+     "model": "Example 32Gb FC HBA",
+     "driver": "qlnativefc",
+     "identifier": "20:00:00:00:00:00:00:02"
+    }
+   ],
+   "vswitches": [
+    {
+     "name": "vSwitch0",
+     "kind": "standard",
+     "mtu": 1500,
+     "uplinks": [
+      "vmnic0"
+     ],
+     "lacp": false,
+     "portgroups": [
+      {
+       "name": "Management Network",
+       "vlan": 0
+      }
+     ]
+    },
+    {
+     "name": "DSwitch-A",
+     "kind": "distributed",
+     "mtu": 9000,
+     "uplinks": [
+      "vmnic2",
+      "vmnic3"
+     ],
+     "lacp": true,
+     "portgroups": [
+      {
+       "name": "PG-Servers",
+       "vlan": 20
+      },
+      {
+       "name": "PG-vSAN",
+       "vlan": 30
+      },
+      {
+       "name": "PG-vMotion",
+       "vlan": 31
+      },
+      {
+       "name": "PG-Trunk",
+       "vlan": "trunk:100-199"
+      }
+     ]
+    }
+   ],
+   "vmkernels": [
+    {
+     "device": "vmk0",
+     "portgroup": "Management Network",
+     "ip": "192.0.2.12",
+     "netmask": "255.255.255.0",
+     "mtu": 1500,
+     "services": [
+      "management"
+     ]
+    },
+    {
+     "device": "vmk1",
+     "portgroup": "PG-vMotion",
+     "ip": "198.51.100.12",
+     "netmask": "255.255.255.0",
+     "mtu": 9000,
+     "services": [
+      "vmotion"
+     ]
+    },
+    {
+     "device": "vmk2",
+     "portgroup": "PG-vSAN",
+     "ip": "198.51.100.32",
+     "netmask": "255.255.255.0",
+     "mtu": 9000,
+     "services": [
+      "vsan"
+     ]
+    }
+   ],
+   "local_disks": [
+    {
+     "device": "naa.6000000000000000000000000000b020",
+     "vendor": "EXAMPLE",
+     "model": "M.2 BOOT",
+     "size_gb": 480,
+     "kind": "ssd"
+    }
+   ],
+   "vsan": {
+    "disk_groups": [
+     {
+      "cache": [
+       {
+        "device": "naa.5000000000000000000000000000c200",
+        "vendor": "EXAMPLE",
+        "model": "NVME 1.6TB",
+        "size_gb": 1600,
+        "kind": "nvme"
+       }
+      ],
+      "capacity": [
+       {
+        "device": "naa.5000000000000000000000000000d200",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d201",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d202",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d203",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       }
+      ]
+     },
+     {
+      "cache": [
+       {
+        "device": "naa.5000000000000000000000000000c210",
+        "vendor": "EXAMPLE",
+        "model": "NVME 1.6TB",
+        "size_gb": 1600,
+        "kind": "nvme"
+       }
+      ],
+      "capacity": [
+       {
+        "device": "naa.5000000000000000000000000000d210",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d211",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d212",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d213",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "host-3",
+   "name": "esx03.example.test",
+   "cluster_id": "domain-c8",
+   "connection_state": "connected",
+   "maintenance_mode": false,
+   "hardware": {
+    "vendor": "Example Systems",
+    "model": "Rack Server 2U",
+    "serial": "EX000003",
+    "uuid": "00000000-0000-0000-0000-000000000003",
+    "bios_version": "1.0.0"
+   },
+   "cpu": {
+    "model": "Intel(R) Xeon(R) Gold 5318Y CPU @ 2.10GHz",
+    "sockets": 2,
+    "cores": 48,
+    "threads": 96,
+    "mhz": 2100
+   },
+   "memory_mb": 524288,
+   "esxi": {
+    "version": "8.0.2",
+    "build": "22380479"
+   },
+   "nics": [
+    {
+     "device": "vmnic0",
+     "mac": "02:00:00:00:00:30",
+     "speed_mbps": 1000,
+     "driver": "ntg3",
+     "pci_id": "14e4:165f"
+    },
+    {
+     "device": "vmnic2",
+     "mac": "02:00:00:00:00:32",
+     "speed_mbps": 25000,
+     "driver": "nmlx5_core",
+     "pci_id": "15b3:1015"
+    },
+    {
+     "device": "vmnic3",
+     "mac": "02:00:00:00:00:33",
+     "speed_mbps": 25000,
+     "driver": "nmlx5_core",
+     "pci_id": "15b3:1015"
+    }
+   ],
+   "storage_adapters": [
+    {
+     "device": "vmhba0",
+     "type": "raid",
+     "model": "Example RAID 8i",
+     "driver": "lsi_mr3"
+    },
+    {
+     "device": "vmhba2",
+     "type": "fc",
+     "model": "Example 32Gb FC HBA",
+     "driver": "qlnativefc",
+     "identifier": "20:00:00:00:00:00:00:03"
+    }
+   ],
+   "vswitches": [
+    {
+     "name": "vSwitch0",
+     "kind": "standard",
+     "mtu": 1500,
+     "uplinks": [
+      "vmnic0"
+     ],
+     "lacp": false,
+     "portgroups": [
+      {
+       "name": "Management Network",
+       "vlan": 0
+      }
+     ]
+    },
+    {
+     "name": "DSwitch-A",
+     "kind": "distributed",
+     "mtu": 9000,
+     "uplinks": [
+      "vmnic2",
+      "vmnic3"
+     ],
+     "lacp": true,
+     "portgroups": [
+      {
+       "name": "PG-Servers",
+       "vlan": 20
+      },
+      {
+       "name": "PG-vSAN",
+       "vlan": 30
+      },
+      {
+       "name": "PG-vMotion",
+       "vlan": 31
+      },
+      {
+       "name": "PG-Trunk",
+       "vlan": "trunk:100-199"
+      }
+     ]
+    }
+   ],
+   "vmkernels": [
+    {
+     "device": "vmk0",
+     "portgroup": "Management Network",
+     "ip": "192.0.2.13",
+     "netmask": "255.255.255.0",
+     "mtu": 1500,
+     "services": [
+      "management"
+     ]
+    },
+    {
+     "device": "vmk1",
+     "portgroup": "PG-vMotion",
+     "ip": "198.51.100.13",
+     "netmask": "255.255.255.0",
+     "mtu": 9000,
+     "services": [
+      "vmotion"
+     ]
+    },
+    {
+     "device": "vmk2",
+     "portgroup": "PG-vSAN",
+     "ip": "198.51.100.33",
+     "netmask": "255.255.255.0",
+     "mtu": 9000,
+     "services": [
+      "vsan"
+     ]
+    }
+   ],
+   "local_disks": [
+    {
+     "device": "naa.6000000000000000000000000000b030",
+     "vendor": "EXAMPLE",
+     "model": "M.2 BOOT",
+     "size_gb": 480,
+     "kind": "ssd"
+    }
+   ],
+   "vsan": {
+    "disk_groups": [
+     {
+      "cache": [
+       {
+        "device": "naa.5000000000000000000000000000c300",
+        "vendor": "EXAMPLE",
+        "model": "NVME 1.6TB",
+        "size_gb": 1600,
+        "kind": "nvme"
+       }
+      ],
+      "capacity": [
+       {
+        "device": "naa.5000000000000000000000000000d300",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d301",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d302",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d303",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       }
+      ]
+     },
+     {
+      "cache": [
+       {
+        "device": "naa.5000000000000000000000000000c310",
+        "vendor": "EXAMPLE",
+        "model": "NVME 1.6TB",
+        "size_gb": 1600,
+        "kind": "nvme"
+       }
+      ],
+      "capacity": [
+       {
+        "device": "naa.5000000000000000000000000000d310",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d311",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d312",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       },
+       {
+        "device": "naa.5000000000000000000000000000d313",
+        "vendor": "EXAMPLE",
+        "model": "SSD 3.84TB",
+        "size_gb": 3840,
+        "kind": "ssd"
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "datastores": [
+  {
+   "id": "datastore-vsan",
+   "name": "vsanDatastore",
+   "type": "vsan",
+   "capacity_gb": 92160,
+   "free_gb": 51200,
+   "host_ids": [
+    "host-1",
+    "host-2",
+    "host-3"
+   ],
+   "backing": {
+    "protocol": "vsan"
+   }
+  },
+  {
+   "id": "datastore-san-01",
+   "name": "SAN-LUN01",
+   "type": "vmfs",
+   "capacity_gb": 8192,
+   "free_gb": 5020,
+   "host_ids": [
+    "host-1",
+    "host-2",
+    "host-3"
+   ],
+   "backing": {
+    "protocol": "fc",
+    "array_vendor": "EXAMPLE",
+    "array_model": "ARRAY-1",
+    "devices": [
+     "naa.600000000000000000000000000f0001"
+    ],
+    "multipath_policy": "VMW_PSP_RR"
+   }
+  }
+ ],
+ "vms": [
+  {
+   "id": "vm-101",
+   "name": "DC01",
+   "host_id": "host-1",
+   "cluster_id": "domain-c8",
+   "template": false,
+   "power_state": "on",
+   "guest": {
+    "os_id": "windows2019srv_64Guest",
+    "os_family": "windows",
+    "os_full_name": "",
+    "hostname": "dc01.corp.example.test",
+    "ip_addresses": [
+     "192.0.2.101"
+    ],
+    "tools_status": "ok"
+   },
+   "cpu": {
+    "vcpus": 2,
+    "cores_per_socket": 1,
+    "reservation_mhz": 0
+   },
+   "memory_mb": 8192,
+   "memory_reservation_mb": 0,
+   "firmware": "efi",
+   "secure_boot": false,
+   "vtpm": false,
+   "hw_version": 19,
+   "encrypted": false,
+   "ft_enabled": false,
+   "cbt_enabled": true,
+   "passthrough_devices": 0,
+   "disks": [
+    {
+     "label": "Hard disk 1",
+     "size_gb": 80,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-vsan"
+    }
+   ],
+   "nics": [
+    {
+     "adapter": "vmxnet3",
+     "mac": "00:50:56:00:00:65",
+     "network": "PG-Servers",
+     "connected": true
+    }
+   ],
+   "snapshots": [],
+   "backup_markers": {
+    "veeam_replica": false,
+    "veeam_cdp": false,
+    "last_backup": "2026-10-20T01:14:00Z"
+   }
+  },
+  {
+   "id": "vm-102",
+   "name": "SQL01",
+   "host_id": "host-2",
+   "cluster_id": "domain-c8",
+   "template": false,
+   "power_state": "on",
+   "guest": {
+    "os_id": "windows2019srv_64Guest",
+    "os_family": "windows",
+    "os_full_name": "",
+    "hostname": "sql01.corp.example.test",
+    "ip_addresses": [
+     "192.0.2.102"
+    ],
+    "tools_status": "ok"
+   },
+   "cpu": {
+    "vcpus": 8,
+    "cores_per_socket": 1,
+    "reservation_mhz": 0
+   },
+   "memory_mb": 65536,
+   "memory_reservation_mb": 0,
+   "firmware": "efi",
+   "secure_boot": false,
+   "vtpm": false,
+   "hw_version": 19,
+   "encrypted": false,
+   "ft_enabled": false,
+   "cbt_enabled": true,
+   "passthrough_devices": 0,
+   "disks": [
+    {
+     "label": "Hard disk 1",
+     "size_gb": 100,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-vsan"
+    },
+    {
+     "label": "Hard disk 2",
+     "size_gb": 500,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-vsan"
+    },
+    {
+     "label": "Hard disk 3",
+     "size_gb": 200,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-vsan"
+    }
+   ],
+   "nics": [
+    {
+     "adapter": "vmxnet3",
+     "mac": "00:50:56:00:00:66",
+     "network": "PG-Servers",
+     "connected": true
+    }
+   ],
+   "snapshots": [],
+   "backup_markers": {
+    "veeam_replica": false,
+    "veeam_cdp": false,
+    "last_backup": "2026-10-20T01:14:00Z"
+   }
+  },
+  {
+   "id": "vm-103",
+   "name": "FILE01",
+   "host_id": "host-3",
+   "cluster_id": "domain-c8",
+   "template": false,
+   "power_state": "on",
+   "guest": {
+    "os_id": "windows2022srvNext_64Guest",
+    "os_family": "windows",
+    "os_full_name": "",
+    "hostname": "file01.corp.example.test",
+    "ip_addresses": [
+     "192.0.2.103"
+    ],
+    "tools_status": "ok"
+   },
+   "cpu": {
+    "vcpus": 4,
+    "cores_per_socket": 1,
+    "reservation_mhz": 0
+   },
+   "memory_mb": 16384,
+   "memory_reservation_mb": 0,
+   "firmware": "efi",
+   "secure_boot": true,
+   "vtpm": true,
+   "hw_version": 20,
+   "encrypted": false,
+   "ft_enabled": false,
+   "cbt_enabled": true,
+   "passthrough_devices": 0,
+   "disks": [
+    {
+     "label": "Hard disk 1",
+     "size_gb": 80,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-san-01"
+    },
+    {
+     "label": "Hard disk 2",
+     "size_gb": 2048,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-san-01"
+    }
+   ],
+   "nics": [
+    {
+     "adapter": "vmxnet3",
+     "mac": "00:50:56:00:00:67",
+     "network": "PG-Servers",
+     "connected": true
+    }
+   ],
+   "snapshots": [
+    {
+     "name": "before-patching",
+     "created": "2026-08-02T22:00:00Z",
+     "size_gb": 41.5
+    }
+   ],
+   "backup_markers": {
+    "veeam_replica": false,
+    "veeam_cdp": false,
+    "last_backup": "2026-10-20T01:14:00Z"
+   }
+  },
+  {
+   "id": "vm-104",
+   "name": "APP01",
+   "host_id": "host-1",
+   "cluster_id": "domain-c8",
+   "template": false,
+   "power_state": "on",
+   "guest": {
+    "os_id": "rhel8_64Guest",
+    "os_family": "linux",
+    "os_full_name": "",
+    "hostname": "app01.corp.example.test",
+    "ip_addresses": [
+     "192.0.2.104"
+    ],
+    "tools_status": "ok"
+   },
+   "cpu": {
+    "vcpus": 4,
+    "cores_per_socket": 1,
+    "reservation_mhz": 0
+   },
+   "memory_mb": 8192,
+   "memory_reservation_mb": 0,
+   "firmware": "bios",
+   "secure_boot": false,
+   "vtpm": false,
+   "hw_version": 14,
+   "encrypted": false,
+   "ft_enabled": false,
+   "cbt_enabled": true,
+   "passthrough_devices": 0,
+   "disks": [
+    {
+     "label": "Hard disk 1",
+     "size_gb": 60,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-vsan"
+    }
+   ],
+   "nics": [
+    {
+     "adapter": "vmxnet3",
+     "mac": "00:50:56:00:00:68",
+     "network": "PG-Servers",
+     "connected": true
+    }
+   ],
+   "snapshots": [],
+   "backup_markers": {
+    "veeam_replica": false,
+    "veeam_cdp": false,
+    "last_backup": "2026-10-20T01:14:00Z"
+   }
+  },
+  {
+   "id": "vm-105",
+   "name": "LEGACY01",
+   "host_id": "host-2",
+   "cluster_id": "domain-c8",
+   "template": false,
+   "power_state": "on",
+   "guest": {
+    "os_id": "windows8srv_64Guest",
+    "os_family": "windows",
+    "os_full_name": "",
+    "hostname": "legacy01.corp.example.test",
+    "ip_addresses": [
+     "192.0.2.105"
+    ],
+    "tools_status": "ok"
+   },
+   "cpu": {
+    "vcpus": 2,
+    "cores_per_socket": 1,
+    "reservation_mhz": 0
+   },
+   "memory_mb": 4096,
+   "memory_reservation_mb": 0,
+   "firmware": "bios",
+   "secure_boot": false,
+   "vtpm": false,
+   "hw_version": 11,
+   "encrypted": false,
+   "ft_enabled": false,
+   "cbt_enabled": false,
+   "passthrough_devices": 0,
+   "disks": [
+    {
+     "label": "Hard disk 1",
+     "size_gb": 60,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-vsan"
+    }
+   ],
+   "nics": [
+    {
+     "adapter": "e1000",
+     "mac": "00:50:56:00:00:69",
+     "network": "PG-Servers",
+     "connected": true
+    }
+   ],
+   "snapshots": [],
+   "backup_markers": {
+    "veeam_replica": false,
+    "veeam_cdp": false,
+    "last_backup": "2026-10-20T01:14:00Z"
+   }
+  },
+  {
+   "id": "vm-201",
+   "name": "SQL01_replica",
+   "host_id": "host-3",
+   "cluster_id": "domain-c8",
+   "template": false,
+   "power_state": "off",
+   "guest": {
+    "os_id": "windows2019srv_64Guest",
+    "os_family": "windows",
+    "os_full_name": "",
+    "hostname": "",
+    "ip_addresses": [],
+    "tools_status": "not_running"
+   },
+   "cpu": {
+    "vcpus": 8,
+    "cores_per_socket": 1,
+    "reservation_mhz": 0
+   },
+   "memory_mb": 65536,
+   "memory_reservation_mb": 0,
+   "firmware": "efi",
+   "secure_boot": false,
+   "vtpm": false,
+   "hw_version": 19,
+   "encrypted": false,
+   "ft_enabled": false,
+   "cbt_enabled": true,
+   "passthrough_devices": 0,
+   "disks": [
+    {
+     "label": "Hard disk 1",
+     "size_gb": 100,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-san-01"
+    },
+    {
+     "label": "Hard disk 2",
+     "size_gb": 500,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-san-01"
+    },
+    {
+     "label": "Hard disk 3",
+     "size_gb": 200,
+     "provisioning": "thin",
+     "controller": "pvscsi",
+     "mode": "persistent",
+     "rdm": "none",
+     "datastore_id": "datastore-san-01"
+    }
+   ],
+   "nics": [
+    {
+     "adapter": "vmxnet3",
+     "mac": "00:50:56:00:00:c9",
+     "network": "PG-Servers",
+     "connected": true
+    }
+   ],
+   "snapshots": [],
+   "backup_markers": {
+    "veeam_replica": true,
+    "veeam_cdp": false,
+    "last_backup": null
+   }
+  }
+ ],
+ "performance": [
+  {
+   "entity": "host",
+   "entity_id": "host-1",
+   "window_days": 30,
+   "cpu_avg_pct": 21.4,
+   "cpu_p95_pct": 48.0,
+   "mem_avg_pct": 61.2,
+   "mem_p95_pct": 66.0,
+   "disk_iops_avg": 840,
+   "disk_iops_p95": 2300,
+   "disk_kbps_avg": 41000,
+   "net_kbps_avg": 18000
+  },
+  {
+   "entity": "vm",
+   "entity_id": "vm-102",
+   "window_days": 30,
+   "cpu_avg_pct": 34.0,
+   "cpu_p95_pct": 81.0,
+   "mem_avg_pct": 88.0,
+   "mem_p95_pct": 92.0,
+   "disk_iops_avg": 610,
+   "disk_iops_p95": 1900,
+   "disk_kbps_avg": 28000,
+   "net_kbps_avg": 4200
+  }
+ ]
+}
