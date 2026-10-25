@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
-vsphere = ["pyvmomi>=8.0"]
+vsphere = ["pyvmomi>=8.0.1"]
 
 [project.scripts]
 lts-discover = "lts_discovery.cli:main"

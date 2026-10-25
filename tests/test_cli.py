@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from lts_discovery.cli import main
+from lts_discovery.cli import _pins, _split_port, main
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
@@ -38,6 +38,24 @@ class Cli(unittest.TestCase):
             summary = json.loads(out_path.read_text())
         self.assertEqual(code, 0)
         self.assertTrue(summary["collection"]["redacted"])
+
+    def test_split_port(self):
+        self.assertEqual(_split_port("esx01.example.test", 443), ("esx01.example.test", 443))
+        self.assertEqual(_split_port("192.0.2.10:8443", 443), ("192.0.2.10", 8443))
+        self.assertEqual(_split_port("[2001:db8::1]:8443", 443), ("2001:db8::1", 8443))
+        self.assertEqual(_split_port("[2001:db8::1]", 443), ("2001:db8::1", 443))
+
+    def test_thumbprint_pins(self):
+        self.assertEqual(_pins(["AA:BB"], ["esx01"]), {"esx01": "AA:BB"})
+        self.assertEqual(_pins(["esx01=AA", "esx02=BB"], ["esx01", "esx02"]), {"esx01": "AA", "esx02": "BB"})
+        with self.assertRaises(ValueError):
+            _pins(["AA:BB"], ["esx01", "esx02"])
+        with self.assertRaises(ValueError):
+            _pins(["esx09=AA"], ["esx01"])
+
+    def test_collect_needs_a_target(self):
+        with self.assertRaises(SystemExit):
+            run("collect", "--user", "u")
 
 
 if __name__ == "__main__":

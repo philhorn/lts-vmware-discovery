@@ -5,16 +5,34 @@ on:
   pull_request:
 permissions:
   contents: read
+env:
+  VCSIM_VERSION: v0.56.1
+  VCSIM_SHA256: 655f592e1c88de44d082a7612bf39fc751556725d0f2a9116ce8ff9cff678357
 jobs:
   unittest:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python: ["3.10", "3.11", "3.12", "3.13"]
+        pyvmomi: ["pyvmomi>=9"]
+        include:
+          - python: "3.12"
+            pyvmomi: "pyvmomi>=8.0.1,<9"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m unittest discover -s tests -v
+      - name: Schema and redaction tests without pyVmomi
+        run: python -m unittest discover -s tests -v
       - run: python -m lts_discovery.cli validate tests/fixtures/*.json
+      - run: pip install "${{ matrix.pyvmomi }}"
+      - name: Fetch vcsim (govmomi simulator)
+        run: |
+          curl -sSfL -o vcsim.tgz "https://github.com/vmware/govmomi/releases/download/${VCSIM_VERSION}/vcsim_Linux_x86_64.tar.gz"
+          echo "${VCSIM_SHA256}  vcsim.tgz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/vcsim" && tar -xzf vcsim.tgz -C "$RUNNER_TEMP/vcsim" vcsim
+      - name: All tests, collector against vcsim
+        run: python -m unittest discover -s tests -v
+        env:
+          LTS_VCSIM: ${{ runner.temp }}/vcsim/vcsim
