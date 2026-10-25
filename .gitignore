@@ -1,0 +1,10 @@
+__pycache__/
+*.egg-info/
+build/
+dist/
+.venv/
+# Real customer output never belongs in this repo.
+report.json
+report.html
+summary.json
+lts-discovery-*/
