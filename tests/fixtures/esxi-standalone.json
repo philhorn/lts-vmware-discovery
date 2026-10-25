@@ -1,0 +1,43 @@
+{
+ "schema_version": 1,
+ "collection": {
+  "tool": "lts-discover", "tool_version": "0.1.0", "source": "esxi", "source_detail": "esx-solo.example.test",
+  "collected_at": "2026-10-24T15:30:00Z",
+  "product": {"name": "VMware ESXi", "version": "6.5.0", "build": "20502893", "api_version": "6.5", "licence_expires": null},
+  "privileges_used": ["System.Anonymous", "System.Read", "System.View"],
+  "perf_window_days": 0.04, "redacted": false, "redaction_salt": "ffeeddccbbaa99887766554433221100",
+  "missing": ["clusters[].ha_enabled", "clusters[].drs_enabled"],
+  "warnings": ["standalone host: performance history covers about one hour"]
+ },
+ "clusters": [],
+ "hosts": [{
+  "id": "ha-host", "name": "esx-solo.example.test", "cluster_id": null,
+  "connection_state": "connected", "maintenance_mode": false,
+  "hardware": {"vendor": "Example Systems", "model": "Tower Server 1U", "serial": "EX000099", "uuid": "00000000-0000-0000-0000-000000000099", "bios_version": "2.1.0"},
+  "cpu": {"model": "Intel(R) Xeon(R) E-2288G CPU @ 3.70GHz", "sockets": 1, "cores": 8, "threads": 16, "mhz": 3700},
+  "memory_mb": 131072,
+  "esxi": {"version": "6.5.0", "build": "20502893"},
+  "nics": [{"device": "vmnic0", "mac": "02:00:00:00:99:01", "speed_mbps": 10000, "driver": "i40en", "pci_id": "8086:1572"},
+           {"device": "vmnic1", "mac": "02:00:00:00:99:02", "speed_mbps": null, "driver": "i40en", "pci_id": "8086:1572"}],
+  "storage_adapters": [{"device": "vmhba64", "type": "iscsi", "model": "iSCSI Software Adapter", "driver": "iscsi_vmk", "identifier": "iqn.1998-01.com.vmware:esx-solo"}],
+  "vswitches": [{"name": "vSwitch0", "kind": "standard", "mtu": 9000, "uplinks": ["vmnic0", "vmnic1"], "lacp": false,
+                 "portgroups": [{"name": "Management Network", "vlan": 0}, {"name": "VM Network", "vlan": 10}, {"name": "iSCSI-A", "vlan": 50}]}],
+  "vmkernels": [{"device": "vmk0", "portgroup": "Management Network", "ip": "192.0.2.50", "netmask": "255.255.255.0", "mtu": 1500, "services": ["management"]},
+                {"device": "vmk1", "portgroup": "iSCSI-A", "ip": "198.51.100.50", "netmask": "255.255.255.0", "mtu": 9000, "services": ["iscsi"]}],
+  "local_disks": []
+ }],
+ "datastores": [{"id": "5f000000-00000000-0000-000000000001", "name": "ISCSI-VOL01", "type": "vmfs", "capacity_gb": 10240, "free_gb": 3100,
+                 "host_ids": ["ha-host"],
+                 "backing": {"protocol": "iscsi", "array_vendor": "EXAMPLE", "array_model": "ARRAY-2", "devices": ["eui.0000000000000001"], "multipath_policy": "VMW_PSP_MRU"}}],
+ "vms": [{
+  "id": "1", "name": "APP02", "host_id": "ha-host", "cluster_id": null, "template": false, "power_state": "on",
+  "guest": {"os_id": "windows8srv_64Guest", "os_family": "windows", "hostname": "app02.corp.example.test", "ip_addresses": ["192.0.2.80"], "tools_status": "old"},
+  "cpu": {"vcpus": 8, "cores_per_socket": 4},
+  "memory_mb": 32768,
+  "firmware": "bios", "hw_version": 13, "cbt_enabled": true,
+  "disks": [{"label": "Hard disk 1", "size_gb": 120, "provisioning": "thick_lazy", "controller": "lsilogic_sas", "mode": "persistent", "rdm": "none", "datastore_id": "5f000000-00000000-0000-000000000001"},
+            {"label": "Hard disk 2", "size_gb": 1024, "provisioning": "thick_eager", "controller": "pvscsi", "mode": "independent_persistent", "rdm": "physical"}],
+  "nics": [{"adapter": "vmxnet3", "mac": "00:0c:29:00:00:01", "network": "VM Network", "connected": true}],
+  "snapshots": []
+ }]
+}

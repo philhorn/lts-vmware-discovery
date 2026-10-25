@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lts-vmware-discovery"
+dynamic = ["version"]
+description = "Read-only VMware vCenter/ESXi discovery for Proxmox migration planning"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+vsphere = ["pyvmomi>=8.0"]
+
+[project.scripts]
+lts-discover = "lts_discovery.cli:main"
+
+[tool.setuptools]
+packages = ["lts_discovery"]
+
+[tool.setuptools.dynamic]
+version = {attr = "lts_discovery.__version__"}
+
+[tool.setuptools.package-data]
+lts_discovery = ["discovery.schema.json"]

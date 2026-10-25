@@ -1,0 +1,363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/philhorn/lts-vmware-discovery/schema/discovery.schema.json",
+  "title": "LTS VMware discovery report",
+  "description": "Facts read from vCenter, ESXi or an imported export. One schema covers the full local report and the redacted summary; identifying fields are optional so the summary can drop them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "collection", "clusters", "hosts", "datastores", "vms"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "collection": {"$ref": "#/$defs/collection"},
+    "clusters": {"type": "array", "items": {"$ref": "#/$defs/cluster"}},
+    "hosts": {"type": "array", "items": {"$ref": "#/$defs/host"}},
+    "datastores": {"type": "array", "items": {"$ref": "#/$defs/datastore"}},
+    "vms": {"type": "array", "items": {"$ref": "#/$defs/vm"}},
+    "performance": {"type": "array", "items": {"$ref": "#/$defs/perf"}}
+  },
+  "$defs": {
+    "ref": {"type": "string", "minLength": 1, "description": "Source id (vSphere moref, RVTools key) or its salted hash in a summary"},
+    "size_gb": {"type": "number", "minimum": 0},
+    "str_or_null": {"type": ["string", "null"]},
+
+    "collection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool", "tool_version", "source", "collected_at", "redacted"],
+      "properties": {
+        "tool": {"const": "lts-discover"},
+        "tool_version": {"type": "string"},
+        "source": {"enum": ["vcenter", "esxi", "rvtools", "import"]},
+        "source_detail": {"type": "string", "description": "Endpoint or file name; dropped from summaries"},
+        "importer": {"type": "string", "description": "Importer name when source is rvtools or import"},
+        "collected_at": {"type": "string", "format": "date-time"},
+        "product": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {"type": "string"},
+            "version": {"type": "string"},
+            "build": {"type": "string"},
+            "api_version": {"type": "string"},
+            "licence_expires": {"$ref": "#/$defs/str_or_null"}
+          }
+        },
+        "privileges_used": {"type": "array", "items": {"type": "string"}},
+        "perf_window_days": {"type": "number", "minimum": 0},
+        "redacted": {"type": "boolean"},
+        "redaction_salt": {"type": "string", "description": "Hex salt for summary hashes; never present in a summary"},
+        "missing": {"type": "array", "items": {"type": "string"}, "description": "Fields the source could not supply, as dotted paths"},
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+
+    "cluster": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {"$ref": "#/$defs/ref"},
+        "name": {"type": "string"},
+        "ha_enabled": {"type": "boolean"},
+        "drs_enabled": {"type": "boolean"},
+        "evc_mode": {"$ref": "#/$defs/str_or_null"},
+        "vsan_enabled": {"type": "boolean"},
+        "host_ids": {"type": "array", "items": {"$ref": "#/$defs/ref"}}
+      }
+    },
+
+    "disk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["size_gb", "kind"],
+      "properties": {
+        "device": {"type": "string", "description": "naa/t10 name; dropped from summaries"},
+        "vendor": {"type": "string"},
+        "model": {"type": "string"},
+        "size_gb": {"$ref": "#/$defs/size_gb"},
+        "kind": {"enum": ["hdd", "ssd", "nvme", "unknown"]}
+      }
+    },
+
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "cpu", "memory_mb"],
+      "properties": {
+        "id": {"$ref": "#/$defs/ref"},
+        "name": {"type": "string"},
+        "cluster_id": {"oneOf": [{"$ref": "#/$defs/ref"}, {"type": "null"}]},
+        "connection_state": {"enum": ["connected", "disconnected", "not_responding", "unknown"]},
+        "maintenance_mode": {"type": "boolean"},
+        "hardware": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "vendor": {"type": "string"},
+            "model": {"type": "string"},
+            "serial": {"type": "string"},
+            "uuid": {"type": "string"},
+            "bios_version": {"type": "string"}
+          }
+        },
+        "cpu": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sockets", "cores", "threads"],
+          "properties": {
+            "model": {"type": "string"},
+            "sockets": {"type": "integer", "minimum": 1},
+            "cores": {"type": "integer", "minimum": 1},
+            "threads": {"type": "integer", "minimum": 1},
+            "mhz": {"type": "integer", "minimum": 0}
+          }
+        },
+        "memory_mb": {"type": "integer", "minimum": 0},
+        "esxi": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"version": {"type": "string"}, "build": {"type": "string"}}
+        },
+        "nics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["device"],
+            "properties": {
+              "device": {"type": "string"},
+              "mac": {"type": "string"},
+              "speed_mbps": {"type": ["integer", "null"], "minimum": 0},
+              "driver": {"type": "string"},
+              "pci_id": {"type": "string", "description": "vendor:device, e.g. 8086:1572"}
+            }
+          }
+        },
+        "storage_adapters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["device", "type"],
+            "properties": {
+              "device": {"type": "string"},
+              "type": {"enum": ["iscsi", "fc", "fcoe", "sas", "sata", "nvme", "raid", "other"]},
+              "model": {"type": "string"},
+              "driver": {"type": "string"},
+              "identifier": {"type": "string", "description": "IQN or WWN; dropped from summaries"}
+            }
+          }
+        },
+        "vswitches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "kind"],
+            "properties": {
+              "name": {"type": "string"},
+              "kind": {"enum": ["standard", "distributed"]},
+              "mtu": {"type": "integer", "minimum": 0},
+              "uplinks": {"type": "array", "items": {"type": "string"}},
+              "lacp": {"type": "boolean"},
+              "portgroups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["name"],
+                  "properties": {
+                    "name": {"type": "string"},
+                    "vlan": {"type": ["integer", "string", "null"], "description": "VLAN id, 4095 or 'trunk:<ranges>'"}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "vmkernels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["device"],
+            "properties": {
+              "device": {"type": "string"},
+              "portgroup": {"type": "string"},
+              "ip": {"type": "string"},
+              "netmask": {"type": "string"},
+              "mtu": {"type": "integer", "minimum": 0},
+              "services": {"type": "array", "items": {"enum": ["management", "vmotion", "vsan", "vsan_witness", "provisioning", "replication", "nfc", "ft", "iscsi", "other"]}}
+            }
+          }
+        },
+        "vsan": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "disk_groups": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["cache", "capacity"],
+                "properties": {
+                  "cache": {"type": "array", "items": {"$ref": "#/$defs/disk"}},
+                  "capacity": {"type": "array", "items": {"$ref": "#/$defs/disk"}}
+                }
+              }
+            }
+          }
+        },
+        "local_disks": {"type": "array", "items": {"$ref": "#/$defs/disk"}}
+      }
+    },
+
+    "datastore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "capacity_gb", "free_gb"],
+      "properties": {
+        "id": {"$ref": "#/$defs/ref"},
+        "name": {"type": "string"},
+        "type": {"enum": ["vmfs", "nfs", "nfs41", "vsan", "vvol", "other"]},
+        "capacity_gb": {"$ref": "#/$defs/size_gb"},
+        "free_gb": {"$ref": "#/$defs/size_gb"},
+        "host_ids": {"type": "array", "items": {"$ref": "#/$defs/ref"}},
+        "backing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["protocol"],
+          "properties": {
+            "protocol": {"enum": ["iscsi", "fc", "fcoe", "nfs", "local", "vsan", "other"]},
+            "array_vendor": {"type": "string", "description": "Vendor string from the SCSI inquiry data"},
+            "array_model": {"type": "string"},
+            "devices": {"type": "array", "items": {"type": "string"}, "description": "naa ids; dropped from summaries"},
+            "multipath_policy": {"type": "string"},
+            "nfs_server": {"type": "string"},
+            "nfs_path": {"type": "string"}
+          }
+        }
+      }
+    },
+
+    "vm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "power_state", "cpu", "memory_mb", "disks"],
+      "properties": {
+        "id": {"$ref": "#/$defs/ref"},
+        "name": {"type": "string"},
+        "host_id": {"oneOf": [{"$ref": "#/$defs/ref"}, {"type": "null"}]},
+        "cluster_id": {"oneOf": [{"$ref": "#/$defs/ref"}, {"type": "null"}]},
+        "template": {"type": "boolean"},
+        "power_state": {"enum": ["on", "off", "suspended"]},
+        "guest": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "os_id": {"type": "string", "description": "vSphere guestId, e.g. windows2019srv_64Guest"},
+            "os_family": {"enum": ["windows", "linux", "other"]},
+            "os_full_name": {"type": "string"},
+            "hostname": {"type": "string"},
+            "ip_addresses": {"type": "array", "items": {"type": "string"}},
+            "tools_status": {"enum": ["ok", "old", "not_running", "not_installed", "unknown"]}
+          }
+        },
+        "cpu": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["vcpus"],
+          "properties": {
+            "vcpus": {"type": "integer", "minimum": 1},
+            "cores_per_socket": {"type": "integer", "minimum": 1},
+            "reservation_mhz": {"type": "integer", "minimum": 0}
+          }
+        },
+        "memory_mb": {"type": "integer", "minimum": 0},
+        "memory_reservation_mb": {"type": "integer", "minimum": 0},
+        "firmware": {"enum": ["bios", "efi"]},
+        "secure_boot": {"type": "boolean"},
+        "vtpm": {"type": "boolean"},
+        "hw_version": {"type": "integer", "minimum": 1},
+        "encrypted": {"type": "boolean"},
+        "ft_enabled": {"type": "boolean"},
+        "cbt_enabled": {"type": "boolean"},
+        "passthrough_devices": {"type": "integer", "minimum": 0},
+        "disks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["size_gb"],
+            "properties": {
+              "label": {"type": "string"},
+              "size_gb": {"$ref": "#/$defs/size_gb"},
+              "provisioning": {"enum": ["thin", "thick_lazy", "thick_eager"]},
+              "controller": {"enum": ["lsilogic", "lsilogic_sas", "pvscsi", "buslogic", "sata", "nvme", "ide"]},
+              "mode": {"enum": ["persistent", "independent_persistent", "independent_nonpersistent"]},
+              "rdm": {"enum": ["none", "physical", "virtual"]},
+              "datastore_id": {"$ref": "#/$defs/ref"}
+            }
+          }
+        },
+        "nics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["adapter"],
+            "properties": {
+              "adapter": {"enum": ["vmxnet3", "vmxnet2", "e1000", "e1000e", "pcnet32", "sriov", "other"]},
+              "mac": {"type": "string"},
+              "network": {"type": "string", "description": "Port group name"},
+              "connected": {"type": "boolean"}
+            }
+          }
+        },
+        "snapshots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["created"],
+            "properties": {
+              "name": {"type": "string"},
+              "created": {"type": "string", "format": "date-time"},
+              "size_gb": {"$ref": "#/$defs/size_gb"}
+            }
+          }
+        },
+        "backup_markers": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Signs of existing backup or replication, read from names, annotations and custom attributes",
+          "properties": {
+            "veeam_replica": {"type": "boolean"},
+            "veeam_cdp": {"type": "boolean"},
+            "last_backup": {"$ref": "#/$defs/str_or_null"}
+          }
+        }
+      }
+    },
+
+    "perf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity", "entity_id", "window_days"],
+      "properties": {
+        "entity": {"enum": ["host", "vm"]},
+        "entity_id": {"$ref": "#/$defs/ref"},
+        "window_days": {"type": "number", "minimum": 0},
+        "cpu_avg_pct": {"type": "number", "minimum": 0},
+        "cpu_p95_pct": {"type": "number", "minimum": 0},
+        "mem_avg_pct": {"type": "number", "minimum": 0},
+        "mem_p95_pct": {"type": "number", "minimum": 0},
+        "disk_iops_avg": {"type": "number", "minimum": 0},
+        "disk_iops_p95": {"type": "number", "minimum": 0},
+        "disk_kbps_avg": {"type": "number", "minimum": 0},
+        "net_kbps_avg": {"type": "number", "minimum": 0}
+      }
+    }
+  }
+}
